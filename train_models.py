@@ -27,8 +27,8 @@ def random_flip_left_right(images):
     images = images.detach()
     return images
         
-def training(train_loader, test_loader, model, epochs, start_epoch, learning_rate, momentum,
-             weight_decay, num_classes, device, train_method=None):
+def training(train_loader, test_loader, model, epochs, start_epoch, learning_rate, lr_schedule, 
+             momentum, weight_decay, num_classes, train_method=None, device=None):
     best_accuracy = 0.
     best_prec_history = 0.
     criterion = nn.CrossEntropyLoss().to(device)
@@ -36,7 +36,7 @@ def training(train_loader, test_loader, model, epochs, start_epoch, learning_rat
                                 momentum=momentum,
                                 weight_decay=weight_decay)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                milestones=[150, 225], gamma=0.1)
+                                milestones=lr_schedule, gamma=0.1)
     for epoch in range(start_epoch, epochs):
         print('current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
         if train_method == 'standard':
