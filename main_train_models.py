@@ -17,7 +17,7 @@ from test_models import testing, manifold_attack, testing_save
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 parser = argparse.ArgumentParser(description='Train neural networks')
-parser.add_argument('--data_set', type=str, default='cifar10', help='Can be either cifar10 | cifar100')
+parser.add_argument('--data_set', type=str, default='cifar100', help='Can be either cifar10 | cifar100')
 parser.add_argument('--epochs', type=int, default=300, help='number of epochs to train')
 parser.add_argument('--weight_decay', default=1e-4, type=float, help='l2 regularization')
 parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
@@ -83,7 +83,7 @@ elif args.data_set == 'cifar100':
 
 
 print('==> Building model..')
-net = resnet20()
+net = resnet20(num_classes=num_classes)
 net = net.to(device)
 
 training(train_loader, test_loader, net, epochs, start_epoch, learning_rate, lr_schedule, momentum, weight_decay,
