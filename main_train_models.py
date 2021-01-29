@@ -14,10 +14,15 @@ from model import *
 from train_models import training
 from test_models import testing, manifold_attack, testing_save
 
+# For reproducibility
+torch.manual_seed(999)
+np.random.seed(999)
+torch.cuda.manual_seed_all(999)
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 parser = argparse.ArgumentParser(description='Train neural networks')
-parser.add_argument('--data_set', type=str, default='cifar100', help='Can be either cifar10 | cifar100')
+parser.add_argument('--data_set', type=str, default='cifar10', help='Can be either cifar10 | cifar100')
 parser.add_argument('--epochs', type=int, default=300, help='number of epochs to train')
 parser.add_argument('--weight_decay', default=1e-4, type=float, help='l2 regularization')
 parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
