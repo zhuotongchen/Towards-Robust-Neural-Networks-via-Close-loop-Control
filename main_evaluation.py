@@ -9,6 +9,7 @@ import torchvision.datasets as datasets
 
 import os
 import sys
+import numpy as np
 import argparse
 
 from model import *

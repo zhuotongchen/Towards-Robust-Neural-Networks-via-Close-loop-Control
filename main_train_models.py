@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
 import os
+import numpy as np
 import argparse
 
 from model import *
