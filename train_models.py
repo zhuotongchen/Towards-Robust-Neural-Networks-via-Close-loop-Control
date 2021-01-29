@@ -48,7 +48,7 @@ def training(train_loader, test_loader, model, epochs, start_epoch, learning_rat
             train_adversarial(train_loader, model, criterion, optimizer, epoch, epochs, device, train_method)
         lr_scheduler.step() 
         
-        accuracy = testing(test_loader, model, step_size=0., eps=0., device)
+        accuracy = testing(test_loader, model, step_size=0., eps=0., device=device)
         print ('Acc: {:.3f}'.format(accuracy))
         best_accuracy = max(accuracy, best_accuracy)
         if best_prec1 > best_prec_history:
