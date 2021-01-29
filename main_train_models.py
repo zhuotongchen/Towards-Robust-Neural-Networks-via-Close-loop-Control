@@ -9,6 +9,7 @@ import torchvision.datasets as datasets
 
 import os
 import numpy as np
+import random
 import argparse
 
 from model import *
@@ -18,6 +19,7 @@ from test_models import testing, manifold_attack, testing_save
 # For reproducibility
 torch.manual_seed(999)
 np.random.seed(999)
+random.seed(999)
 torch.cuda.manual_seed_all(999)
 torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.deterministic=True
@@ -62,7 +64,7 @@ if args.data_set == 'cifar10':
             transforms.ToTensor(),
             normalize,
         ]), download=True),
-        batch_size=batch_size, shuffle=False,
+        batch_size=batch_size, shuffle=True,
         num_workers=workers, pin_memory=True)
     test_loader = torch.utils.data.DataLoader(
         datasets.CIFAR10(root='./data', train=False, transform=transforms.Compose([
