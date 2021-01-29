@@ -62,7 +62,7 @@ if args.data_set == 'cifar10':
             transforms.ToTensor(),
             normalize,
         ]), download=True),
-        batch_size=batch_size, shuffle=True,
+        batch_size=batch_size, shuffle=False,
         num_workers=workers, pin_memory=True)
     test_loader = torch.utils.data.DataLoader(
         datasets.CIFAR10(root='./data', train=False, transform=transforms.Compose([
