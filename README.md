@@ -16,6 +16,7 @@ It can be applied to any classifier to improve its robustness. Given unknown dat
 
 ## Dependencies
 ```bash
+Python == 3.6.9
 Pytorch == 1.5.1
 numpy == 1.19.0
 ```
