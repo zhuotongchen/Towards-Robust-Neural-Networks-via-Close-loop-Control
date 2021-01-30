@@ -5,7 +5,7 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 
 from test_models import testing
-from Adversarial_attack import fgsm, random, pgd_unconstrained
+from Adversarial_attack import fgsm, Random, pgd_unconstrained
 
 def truncated_normal(size):
     values = torch.fmod(torch.randn(size), 2) * 8
@@ -124,7 +124,7 @@ def train_adversarial(train_loader, model, criterion, optimizer, epoch, num_epoc
         if train_method == 'fgsm':
             images_adv_ = fgsm(images, predicted_label, eps_defense, criterion, model)
         elif train_method == 'random':
-            images_adv = random(images, predicted_label, eps_defense, criterion, model)
+            images_adv = Random(images, predicted_label, eps_defense, criterion, model)
         elif train_method == 'pgd':
             random_number = torch.abs(truncated_normal(1))
             attack_iter = int(min(random_number + 4, 1.25 * random_number))

@@ -46,7 +46,7 @@ def fgsm(x, labels, eps, loss_function, model):
     return x_adv.detach()
 
 # Uniform random perturbation
-def random(x, labels, eps, loss_function, model):
+def Random(x, labels, eps, loss_function, model):
     eps = (eps / 255.) / SIGMA
     with torch.no_grad():
         adv_gradient = torch.sign(torch.normal(torch.zeros_like(x), torch.ones_like(x)))

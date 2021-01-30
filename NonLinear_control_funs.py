@@ -2,9 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+import os
+import sys
 import numpy as np
 
-from Adversarial_attack import fgsm, random, pgd, CW_attack, Manifold_attack
+from Adversarial_attack import fgsm, Random, pgd, CW_attack, Manifold_attack
 
 from tabulate import tabulate
 
@@ -59,7 +61,7 @@ class Nonlinear_Control:
             elif attack == 'fgsm':
                 images_ = fgsm(inputs, labels, eps, criterion, self.model)
             elif attack == 'random':
-                images_ = random(inputs, labels, eps, criterion, self.model)
+                images_ = Random(inputs, labels, eps, criterion, self.model)
             elif attack == 'pgd':
                 images_ = pgd(self.model, inputs, labels, criterion, num_steps=20, step_size=step_size, eps=eps)
             elif attack == 'cw':
@@ -170,7 +172,7 @@ class Nonlinear_Control:
                     accuracies = []
                     for eps in eps_attack:
                         if attack == 'random': 
-                            data = random(inputs, labels, eps=eps, loss_function=criterion, model=self.model)
+                            data = Random(inputs, labels, eps=eps, loss_function=criterion, model=self.model)
                         elif attack == 'fgsm':
                             data = fgsm(inputs, labels, eps=eps, loss_function=criterion, model=self.model)
                         elif attack == 'pgd':

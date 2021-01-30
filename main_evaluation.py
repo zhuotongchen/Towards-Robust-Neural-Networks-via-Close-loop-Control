@@ -7,6 +7,7 @@ import torchvision.datasets as datasets
 import os
 import sys
 import numpy as np
+import random
 import argparse
 
 from model import *
@@ -14,7 +15,7 @@ from train_models import training
 from test_models import testing, manifold_attack
 
 from Linear_control_funs import Linear_Control
-from NonLinear_control_fund import Nonlinear_Control
+from NonLinear_control_funs import Nonlinear_Control
 
 # For reproducibility
 torch.manual_seed(999)

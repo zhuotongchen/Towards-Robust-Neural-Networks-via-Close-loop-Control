@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import StepLR
 
-from Adversarial_attack import fgsm, random, pgd, CW_attack, Manifold_attack
+from Adversarial_attack import fgsm, Random, pgd, CW_attack, Manifold_attack
 
 def testing(test_loader, model, step_size, eps, attack='None', device=None):    
     model.eval()
@@ -20,7 +20,7 @@ def testing(test_loader, model, step_size, eps, attack='None', device=None):
         elif attack == 'fgsm':
             images_ = fgsm(inputs, labels, eps, criterion, model)
         elif attack == 'random':
-            images_ = random(inputs, labels, eps, criterion, model)
+            images_ = Random(inputs, labels, eps, criterion, model)
         elif attack == 'pgd':
             images_ = pgd(model, inputs, labels, criterion, num_steps=20, step_size=step_size, eps=eps)
         elif attack == 'cw':
