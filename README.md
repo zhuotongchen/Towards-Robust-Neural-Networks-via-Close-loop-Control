@@ -39,11 +39,19 @@ The code in this repo are capable of doing the follwoing tasks:
    - Train a set of auto-encoders for all input and hidden states (main_train_encoders.py)
    - Search for the optimal learning rate and maximum iteration number for the PMP dynamics (main_evaluation.py --pmp_select_parameters).
    - For evaluation with the defense, select defense_type (None, layer_wise_projection, linear_pmp), perturbation type and magnitude.
-   
+
+## License
+This project is licensed under the MIT license - see the [LICENSE](https://github.com/zhuotongchen/Towards-Robust-Neural-Networks-via-Close-loop-Control/blob/master/LICENSE) file for more details.
+
 ## Citation
 If you use this code for your research, please cite our paper:
 ```bash
-will be provided soon
+@article{chentowards,
+  title={TOWARDS ROBUST NEURAL NETWORKS VIA CLOSE-LOOP CONTROL},
+  author={Chen, Zhuotong and Li, Qianxiao and Zhang, Zheng}
+}
 ```
 
+## Contact
+Please contact <ztchen@ucsb.edu> or <zhuotongchen@gmail.com> if you have any question on the code.
 
