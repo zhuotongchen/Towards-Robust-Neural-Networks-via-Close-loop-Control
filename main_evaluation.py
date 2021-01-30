@@ -1,7 +1,4 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 import torchvision
 import torchvision.transforms as transforms
@@ -14,14 +11,18 @@ import argparse
 
 from model import *
 from train_models import training
-from test_models import testing, manifold_attack, testing_save
+from test_models import testing, manifold_attack
 
-from pca_source import Linear_Control
+from Linear_control_funs import Linear_Control
+from NonLinear_control_fund import Nonlinear_Control
 
 # For reproducibility
 torch.manual_seed(999)
 np.random.seed(999)
+random.seed(999)
 torch.cuda.manual_seed_all(999)
+torch.backends.cudnn.benchmark = True
+torch.backends.cudnn.deterministic=True
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -35,8 +36,8 @@ parser.add_argument('--perturbation_type', type=str, default='None',
 parser.add_argument('--perturbation_eps', type=float, default=8.,
                     help='Choose a perturbation magnitude')
 parser.add_argument('--defense_type', default='None', type=str,
-                    choices=['None', 'layer_wise_projection', 'linear_pmp'],
-                    help='Choose a defense type between [None, layer_wise_projection, linear_pmp]')
+                    choices=['None', 'layer_wise_projection', 'linear_pmp', 'non_linear_pmp'],
+                    help='Choose a defense type between [None, layer_wise_projection, linear_pmp, non_linear_pmp]')
 parser.add_argument('--pmp_lr', type=float, default=0.01,
                     help='Choose a learning rate for the PMP defense')
 parser.add_argument('--pmp_maximum_iterations', type=int, default=10,
@@ -97,7 +98,7 @@ elif data_set == 'cifar100':
         batch_size=128, shuffle=False,
         num_workers=workers, pin_memory=True)
 
-
+# Select a trained model
 print('==> Building model..')
 net = resnet20(num_classes=num_classes)
 net = net.to(device)
@@ -122,23 +123,42 @@ elif model_selection == 'resnet20_pgd':
     elif data_set == 'cifar100':
         net.load_state_dict(torch.load('models_cifar100/resnet20_pgd.ckpt', map_location=device))
 
+# Select a hyper-parameters of the pmp
 if pmp_param_selection:
     Lin = Linear_Control(net)
     Lin.compute_Princ_basis(train_loader)
     Lin.from_basis_projection()
     Lin.PMP_testing(test_loader)
     sys.exit("Searching pmp hyper-parameters done") 
-    
+
+# Testing against various perturbations without defense
 if defense_type == 'None':
     testing(test_loader, net, step_size=pert_epsilon/4., eps=pert_epsilon, attack=pert_type, device=device)
+    
+# Testing against various perturbations with layer-wise-projection
 elif defense_type == 'layer_wise_projection':
     Lin = Linear_Control(net)
     Lin.compute_Princ_basis(train_loader)
     Lin.from_basis_projection()
     Lin.testing(test_loader, eps=pert_epsilon, step_size=pert_epsilon/4., attack=pert_type, defense=defense_type)
+    
+# Testing against various perturbations with pmp consisted of linear embedding
 elif defense_type == 'linear_pmp':
     Lin = Linear_Control(net)
     Lin.compute_Princ_basis(train_loader)
     Lin.from_basis_projection()
     Lin.testing(test_loader, eps=pert_epsilon, step_size=pert_epsilon/4., attack=pert_type, defense='pmp', 
                 lr=pmp_lr, max_iter=pmp_max_iter)
+
+# Testing against various perturbations with pmp consisted of nonlinear embedding
+elif defense_type == 'non_linear_pmp':
+    # Import the trained auto-encoders sequentially,
+    # e.g. [Auto_encoder_0, Auto_encoder_1,...,Auto_encoder_4]
+    embedding_funs = []
+    Lin = Nonlinear_Control(net, embedding_funs)
+    Lin.testing(test_loader, eps=pert_epsilon, step_size=pert_epsilon/4., attack=pert_type, defense='pmp', 
+                lr=pmp_lr, max_iter=pmp_max_iter)
+
+
+
+

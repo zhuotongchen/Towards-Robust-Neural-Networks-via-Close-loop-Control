@@ -11,6 +11,7 @@ upper, lower = (1. - MEAN) / SIGMA, (0. - MEAN) / SIGMA
 lower = lower[None, :, None, None]
 upper = upper[None, :, None, None]
 
+# Project gradient descent attack without maximum epsilon constraint
 def pgd_unconstrained(model, x, y, loss_fn, num_steps, step_size):
     step_size = (step_size / 255.) / SIGMA
     step_size = step_size[None, :, None, None]
@@ -28,6 +29,7 @@ def pgd_unconstrained(model, x, y, loss_fn, num_steps, step_size):
             x_adv = torch.max(torch.min(x_adv, upper), lower)
     return x_adv.detach()
 
+# The fast gradient sign method
 def fgsm(x, labels, eps, loss_function, model):
     eps = (eps / 255.) / SIGMA
     eps = eps[None, :, None, None]
@@ -43,6 +45,7 @@ def fgsm(x, labels, eps, loss_function, model):
         x_adv = torch.max(torch.min(x_adv, upper), lower)
     return x_adv.detach()
 
+# Uniform random perturbation
 def random(x, labels, eps, loss_function, model):
     eps = (eps / 255.) / SIGMA
     with torch.no_grad():
@@ -52,6 +55,7 @@ def random(x, labels, eps, loss_function, model):
         x_adv = torch.max(torch.min(x_adv, upper), lower)
     return x_adv.detach()
 
+# The project gradient descent attack
 def pgd(model, x, y, loss_fn, num_steps, step_size, eps):
     step_size = (step_size / 255.) / SIGMA
     step_size = step_size[None, :, None, None]
@@ -312,71 +316,3 @@ class Manifold_attack:
             
             # we didn't succeed, increase constant and try again
             const *= self.const_factor
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def manifold_attack(x, labels, eps, loss_function, model, V):
-     r = []
-     eps = (eps / 255.) / SIGMA
-     for count, (x, target) in enumerate(zip(x, labels)):
-         # Image in scaled range
-         x = x.view(1, 3, 32, 32)
-         img_ = x.clone()
-         # Transform image into range of [-0.5, 0.5]
-         img_ = img_de_transform(img_) - 0.5
-         x_adv = Attack_single_image(img_, target, model, method='manifold', V=V)
-         x_adv = img_transform((x_adv + 0.5))
-         x_adv = torch.max(torch.min(x_adv, x + eps), x - eps)
-         x_adv = torch.max(torch.min(x_adv, upper), lower)          
-         
-         r.extend(x_adv)
-     return torch.stack(r)
-
-def manifold_attack_subroutine(timg, labels, simg, tau, const, learning_rate, model, V):
-    _, chan, height, width = timg.shape
-    dim, embed = V.shape
-    modifier = torch.zeros([embed, 1], dtype=torch.float32, requires_grad=True)
-    optimizer = torch.optim.Adam([modifier], learning_rate)
-    simg_ = img_transform((torch.tanh(simg) / 2. + 0.5) * 255.)
-    while const < LARGEST_CONST:
-        #print('try const', const)
-        for step in range(MAX_ITERATIONS):
-            noise = torch.mm(V, modifier).view(1, 3, 32, 32)
-            newimg = img_de_transform(simg_ + noise) / 255. - 0.5
-            
-            output = model(img_transform((newimg + 0.5) * 255.)).squeeze()
-            orig_output = model(img_transform((torch.tanh(timg) / 2 + 0.5) * 255.)).squeeze() 
-            
-            real = (labels * output).sum()
-            other = ((1 - labels) * output - (labels * 10000)).max()
-            
-            if TARGETED:
-                loss1 = torch.max(torch.zeros(1).to(device), other - real)
-            else:
-                loss1 = torch.max(torch.zeros(1).to(device), real - other)
-
-            loss2 = torch.max(torch.zeros(1).to(device), torch.abs(newimg - torch.tanh(timg) / 2) - tau).sum()
-            loss = const * loss1 + loss2
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()            
-            if loss < 0.0001 * const and ABORT_EARLY:
-                works = compare(output.argmax(), labels.argmax())
-                if works:
-                    #print('adversrial attack works')
-                    return newimg, 'succ'
-        const *= CONST_FACTOR
-    return None, 'fail'
