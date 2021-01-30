@@ -1,6 +1,6 @@
 # Towards-Robust-Neural-Networks-via-Close-loop-Control
 This repo contains necessary code for the paper [Towards Robust Neural Networks via Close-loop Control](https://openreview.net/pdf?id=2AL06y9cDE-) 
-by [Zhuotong Chen](https://scholar.google.com/citations?user=OVs7TPUAAAAJ&hl=en), [Qianxiao LI](https://discovery.nus.edu.sg/9699-qianxiao-li) 
+by [Zhuotong Chen](https://scholar.google.com/citations?user=OVs7TPUAAAAJ&hl=en), [Qianxiao Li](https://discovery.nus.edu.sg/9699-qianxiao-li) 
 and [Zheng Zhang](https://web.ece.ucsb.edu/~zhengzhang/).
 
 ## Description
